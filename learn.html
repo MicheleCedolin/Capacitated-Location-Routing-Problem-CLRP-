@@ -88,7 +88,10 @@ subject to  every customer j belongs to exactly one J_r
   <li>Prins et al. and Duhamel et al. use three neighbourhoods (MOVE, SWAP, OPT) with a first-improving rule and keep the depot set fixed during local search.</li>
   <li>Löffler et al. use a VND over 13 operators in a fixed order (Relocate, Exchange, Split and 2-opt* variants) and a separate refinement of the depot configuration; their single-operator removal test is the basis of the operator list here.</li>
   <li>“Reassign a route to another depot” has no separate counterpart in these papers; the reassignment of trips to depots is implicit in their 2-opt move between routes of different depots.</li>
-  <li>The column “Survey 2014” rests on the survey of Prodhon and Prins, which describes the neighbourhoods of Jarboui et al. and of Yu et al.</li>
+  <li>Prins et al. (2006b) use the same three moves as Prins et al. (2007). In both, a depot is opened only by the crossover or the repair, not by the local search. The OPT move between routes allows several ways of reconnecting; the paper does not list them, hence “≈”.</li>
+  <li>Yu et al. apply insertion, swap and a modified 2-opt to a single string that holds all routes, the depots and dummy zeros, so a move can stay inside a route or cross routes and can involve depot nodes; the cells are therefore “≈”.</li>
+  <li>Jarboui et al. solve a variant (one uncapacitated vehicle per depot, no vehicle capacity). The column lists their moves only; their results are not comparable with CLRP values. Their segment moves (Or-opt, inverse Or-opt) cover our two-customer moves as a special case, and their add/drop depot move closes one depot and opens another.</li>
+  <li>Contardo et al. cycle through seven procedures. Their “facility swap” gives all routes of an open depot to a closed one; “route swap” exchanges two routes between depots; “giant tour split” merges the routes of a depot and cuts them again optimally.</li>
   <li>The reversed-tail and reversed-pair variants (<em>_rev</em>) are our own extensions of the basic moves.</li>
   <li>Our operators scan the whole neighbourhood (no granular pruning) and accept only feasible solutions; some of the cited papers use granular neighbourhoods or allow temporary capacity violations.</li>
 </ul>

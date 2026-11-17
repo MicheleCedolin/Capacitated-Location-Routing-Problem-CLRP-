@@ -84,7 +84,7 @@ MAP = {
   'inter_relocate1': ['kinder97', 'osman93'], 'inter_relocate2': ['kinder97', 'osman93'], 'inter_relocate2_rev': ['kinder97', 'osman93'], 'inter_swap11': ['kinder97', 'osman93'],
   'inter_swap21': ['osman93', 'taillard97'], 'inter_swap22': ['osman93', 'taillard97'], 'inter_swap22_rev': ['osman93', 'taillard97'], 'two_opt_star': ['potvin95'], 'two_opt_star_rev': ['potvin95'],
   'route_split': ['prins06a'], 'depot_close': ['prins06a', 'nagy07'], 'depot_move_all': ['prins06a', 'nagy07'], 'depot_open': ['prins06a', 'nagy07']}}
-COLS = [('prins06a', 'Prins et al. 2006a'), ('duhamel10', 'Duhamel et al. 2010'), ('escobar13', 'Escobar et al. 2013'), ('loffler23', 'Löffler et al. 2023'), ('prodhon14', 'Survey 2014 (Jarboui, Yu)'), ('vidal22', 'Vidal 2022')]
+COLS = [('prins06a', 'Prins et al. 2006a'), ('prins06b', 'Prins et al. 2006b'), ('duhamel10', 'Duhamel et al. 2010'), ('escobar13', 'Escobar et al. 2013'), ('yu10', 'Yu et al. 2010'), ('jarboui13', 'Jarboui et al. 2013'), ('contardo14b', 'Contardo et al. 2014'), ('loffler23', 'Löffler et al. 2023'), ('vidal22', 'Vidal 2022')]
 # rows follow our reading of the papers (project note of 2026-10-29); y = verified in the text, p = similar / partly / implicit, n = not found in the sections read; a dagger column was not re-read
 M = {
  'intra_relocate1': 'y y y y n p', 'inter_relocate1': 'y y y y n p', 'intra_swap11': 'y y y y n p', 'inter_swap11': 'y y y y n p', 'intra_2opt': 'y y n n n y',
@@ -93,4 +93,16 @@ M = {
  'inter_swap21': 'n n n n n p', 'inter_swap22': 'n n y p n p', 'inter_swap22_rev': 'n n n n n n',
  'route_split': 'n n n p n n', 'depot_reassign': 'p p n n n n',
  'depot_close': 'n n n p p n', 'depot_move_all': 'n n n n p n', 'depot_open': 'n n n n p n'}
+# new columns (read 17 Nov 2026), in the order of ROWS below; old six-column rows are re-ordered: old index prins06a 0, duhamel10 1, escobar13 2, loffler23 3, prodhon14 4 (dropped: its content came from Jarboui and Yu), vidal22 5
+ROWS = ['intra_relocate1', 'inter_relocate1', 'intra_swap11', 'inter_swap11', 'intra_2opt', 'two_opt_star', 'two_opt_star_rev', 'intra_relocate2', 'inter_relocate2', 'inter_relocate2_rev', 'inter_swap21', 'inter_swap22', 'inter_swap22_rev', 'route_split', 'depot_reassign', 'depot_close', 'depot_move_all', 'depot_open']
+NEW = {
+ 'prins06b':     'y y y y y p p n n n n n n n n n n n',
+ 'yu10':         'p p p p p n n n n n n n n n n p n p',
+ 'jarboui13':    'y y y y y n n p p p n n n n n p p p',
+ 'contardo14b':  'n n y y y y n n n n n n n p p p y p'}
+assert set(M) == set(ROWS) and all(len(v.split()) == len(ROWS) for v in NEW.values())
+def newrow(r):
+    o = M[r].split(); k = ROWS.index(r); g = lambda c: NEW[c].split()[k]
+    return [o[0], g('prins06b'), o[1], o[2], g('yu10'), g('jarboui13'), g('contardo14b'), o[3], o[5]]
+M = {r: ' '.join(newrow(r)) for r in ROWS}
 json.dump({'map': MAP, 'cols': COLS, 'matrix': {k: v.split() for k, v in M.items()}}, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'learn_map.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
