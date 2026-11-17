@@ -75,7 +75,7 @@ footer { color: var(--muted); font-size: .85rem; padding: 18px 0 40px; border-to
 table.lit { width: 100%; border-collapse: collapse; font-size: .85rem; margin: 10px 0; display: block; overflow-x: auto; }
 table.lit th, table.lit td { border: 1px solid var(--line); padding: 4px 7px; text-align: center; white-space: nowrap; } table.lit th:first-child, table.lit td:first-child { text-align: left; position: sticky; left: 0; background: var(--card); }
 table.lit td.y { color: var(--ok); font-weight: 700; } table.lit td.p { color: var(--warn); font-weight: 700; } table.lit td.n { color: var(--muted); }
-ol.refs { padding-left: 24px; font-size: .92rem; } ol.refs li { margin: 6px 0; max-width: 90ch; }
+ol.refs { padding-left: 24px; font-size: .92rem; } ol.refs li { margin: 6px 0; max-width: 90ch; overflow-wrap: anywhere; }
 .jump { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 10px 0 0; padding: 0; list-style: none; } .jump a { text-decoration: none; font-weight: 600; font-size: .92rem; }
 
 /* Learn page animations and operator pictures */
