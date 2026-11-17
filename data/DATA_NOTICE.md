@@ -12,7 +12,25 @@ The licence of the program code does **not** cover the files in `data/instances/
 
 Full references with DOIs are on the Learn page.
 
-**Before this repository is made public** (repository owner to confirm and complete):
+## What was checked (17 Nov 2026)
 
-- [ ] Permission to redistribute the P, B and T instance files and the best known values is confirmed, and the written terms are filed with the release records.
-- [ ] Distance rule for the P instances is reconciled (documentation of the set: rounded down; HGAMP code: rounded up; this site rounds up).
+- The HGAMP code and data archive (https://github.com/INFORMSJoC/2023.0416, doi:10.1287/ijoc.2023.0416.cd) states in its
+  README that it is distributed under the **MIT License** and that it contains the benchmark instances and the best
+  solutions. The copyright holder is not named in the README text that was read, and the LICENSE file itself was not read.
+  An MIT licence on that archive does not by itself show that the original authors of the P, B and T sets allowed
+  redistribution.
+- The page of the P instances (prodhonc.free.fr) could not be read from this workspace (blocked for automatic access),
+  so its usage terms are unknown.
+- Distance rule of the P instances. Evidence found: (a) a search-engine excerpt of Prins et al. (2007) says the costs are
+  the distances multiplied by 100 and rounded up; (b) HGAMP certified values reproduce under round-up in our runs (our own checks);
+  (c) the HGAMP preprint (arXiv:2403.09361) and the README of the archive do not state the rule; (d) the preprint
+  arXiv:2412.05665 says “rounded to the nearest integer”, citing the page of the set; (e) an earlier note of ours said
+  “rounded down”. The site rounds up.
+
+## Still open (repository owner)
+
+- [ ] Written permission (or licence terms) for redistributing the P, B and T instance files and the best known values is
+  confirmed and filed with the release records. The author's statement of permission is recorded in internal notes;
+  the written terms are not filed yet.
+- [ ] Distance rule of the P instances: read the original documentation of the set (Prins et al. 2006/2007 full text or the
+  instance page) and record the rule here. Until then gaps on P instances should be compared with care.

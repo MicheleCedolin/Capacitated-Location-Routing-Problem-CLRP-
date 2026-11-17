@@ -52,8 +52,8 @@ operating systems have not been tested.
 - **Time-limited runs depend on the device.** The number of iterations done in a time limit depends on the speed of the
   visitor's device, so costs can differ between devices. Runs without a time limit are deterministic for a seed.
 - **Depot layer `mip` is not offered:** the C++ engine has no MILP solver. Only `none` and `halving` are available.
-- **BKS values are published snapshots,** not certified optima; negative gaps are possible. For the P set, the rounding
-  of distances is documented differently from the HGAMP code (see `data/DATA_NOTICE.md`); the site rounds up.
+- **BKS values are published snapshots,** not certified optima; negative gaps are possible. For the P set, sources disagree on the rounding
+  of distances (see `data/DATA_NOTICE.md`); the site rounds up, as the HGAMP code does.
 - **Data and licence.** The licence of the code does not cover the instance data and reference values; read
   `data/DATA_NOTICE.md` and complete its checklist before making the repository public. No licence file is included
   here: add the licence you chose for the lab application.
