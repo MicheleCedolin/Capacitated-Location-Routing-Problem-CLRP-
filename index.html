@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLRP Solver</title>
+<meta name="description" content="Run heuristics for the capacitated location-routing problem (CLRP) in your browser. No installation.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <h1>CLRP Solver</h1>
+  <nav><a href="index.html" aria-current="page">Solver</a><a href="learn.html">Learn</a></nav>
+  <p class="tagline">Run capacitated location-routing heuristics in your browser. No installation, no Python, no R.</p>
+</div></header>
+
+<main class="wrap">
+<noscript><p class="err">This page needs JavaScript and WebAssembly.</p></noscript>
+<div id="boot" class="card">Loading the solver…</div>
+
+<section class="panel" id="p-instance">
+  <h2><span class="num">1</span>Choose an instance</h2>
+  <label class="inline"><input type="radio" name="isrc" value="builtin" checked> Built-in benchmark</label>
+  <label class="inline"><input type="radio" name="isrc" value="upload"> Upload your own (.dat or .json)</label>
+  <div id="inst-builtin">
+    <div class="row"><div><label for="inst-sel">Instance</label><select id="inst-sel"></select></div></div>
+  </div>
+  <div id="inst-upload" hidden>
+    <label for="up-file">File</label><input type="file" id="up-file" accept=".dat,.json,.txt">
+    <p class="hint">Two formats are read: the benchmark <code>.dat</code> layout used by the P, B and T sets (see <a href="learn.html#formats">Learn</a>) and a simple <code>.json</code> file. <button class="small" id="up-example" type="button">Download a JSON example</button></p>
+    <p class="err small" id="up-err"></p>
+  </div>
+  <div class="info" id="inst-info"></div>
+  <div class="chart map" id="inst-map" hidden></div>
+  <p class="hint">Customers are dots (larger dot = larger demand); candidate depots are squares. Hover for details.</p>
+</section>
+
+<section class="panel" id="p-heur">
+  <h2><span class="num">2</span>Choose a heuristic</h2>
+  <label for="heur-sel">Algorithm</label><select id="heur-sel"></select>
+  <div class="card" id="heur-card"></div>
+</section>
+
+<section class="panel" id="p-ls">
+  <h2><span class="num">3</span>Local search operators</h2>
+  <div class="row">
+    <div><label for="ls-sel">Move selection</label><select id="ls-sel"></select></div>
+    <div id="preset-box"><label for="preset-sel">Operator set</label><select id="preset-sel"></select></div>
+  </div>
+  <div class="card" id="ls-card"></div>
+  <div id="ops-box">
+    <label>Operator order <span class="muted small">(the order matters for VND, RVND and first improvement)</span></label>
+    <div class="chips" id="ops-chips"></div>
+    <div class="row"><div><label for="op-add">Add an operator</label><select id="op-add"></select></div><div><button class="small" id="op-clear" type="button">Clear list</button></div></div>
+    <p class="hint" id="ops-note"></p>
+  </div>
+  <details id="adv"><summary>Advanced parameters of the heuristic</summary><div class="params" id="params"></div><p class="hint">Defaults are the values used in the experiments. Parameters that stop a run by count (iterations, generations) have no effect under a time limit.</p></details>
+</section>
+
+<section class="panel" id="p-run">
+  <h2><span class="num">4</span>Run and estimated time</h2>
+  <div class="row">
+    <div><label for="seed0">First seed</label><input type="number" id="seed0" value="1" min="0" step="1"></div>
+    <div><label for="nseeds">Number of seeds</label><input type="number" id="nseeds" value="3" min="1" max="200" step="1"></div>
+    <div><label for="tlim">Time limit per run (seconds)</label><input type="number" id="tlim" value="5" min="0.5" max="3600" step="0.5"></div>
+    <div><label for="nwork">Parallel workers</label><input type="number" id="nwork" value="1" min="1" max="32" step="1"></div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <div><button class="small" id="q-quick" type="button">Quick test: 3 × 5 s</button> <button class="small" id="q-short" type="button">Short: 5 × 30 s</button></div>
+  </div>
+  <p>Estimated time: <strong id="est">–</strong> <span class="muted small" id="est-note"></span></p>
+  <div class="row"><button class="primary" id="run" type="button">Run</button><button id="cancel" type="button" disabled>Cancel</button><span id="status" class="muted small"></span></div>
+  <div class="bar" id="bar" hidden><i></i></div>
+  <p class="err small" id="run-err"></p>
+</section>
+
+<section class="panel" id="p-res">
+  <h2><span class="num">5</span>Results</h2>
+  <p class="muted" id="res-empty">No runs yet.</p>
+  <div id="res" hidden>
+    <div id="res-sum" class="info"></div>
+    <h3 style="margin:16px 0 4px;font-size:1rem">Gap to the best known solution</h3>
+    <div class="chart" id="gap-chart"></div>
+    <div class="row" style="align-items:center"><h3 style="margin:16px 0 4px;font-size:1rem">Routes of the best run</h3><div><select id="route-seed" style="min-width:140px"></select></div></div>
+    <div class="info" id="route-info"></div><div class="chart" id="route-chart"></div>
+    <h3 style="margin:16px 0 4px;font-size:1rem">Convergence</h3>
+    <div class="chart" id="conv-chart"></div>
+    <h3 style="margin:16px 0 4px;font-size:1rem">All runs</h3>
+    <div style="overflow-x:auto"><table class="res" id="res-table"><thead><tr><th>Seed</th><th>Cost</th><th>Opening</th><th>Vehicles</th><th>Routing</th><th>Gap to BKS</th><th>Time to best</th><th>Wall time</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+    <div class="row" style="margin-top:12px"><button id="dl-csv" type="button">Download CSV</button><button id="dl-log" type="button">Download solver log</button><button id="dl-sol" type="button">Download best solution (JSON)</button><button id="dl-cfg" type="button">Download settings</button></div>
+  </div>
+</section>
+
+<section class="panel" id="about">
+  <h2>About this solver</h2>
+  <p><strong>Problem.</strong> Each solution opens a set of depots, uses vehicles of limited capacity and visits every customer exactly once. The cost is <em>depot opening costs + fixed vehicle costs + routing costs</em>. A route starts and ends at the same depot, its load may not exceed the vehicle capacity, and the load of all routes of a depot may not exceed the depot capacity. <a href="learn.html#problem">Read the model on the Learn page.</a></p>
+  <p><strong>Gap.</strong> The gap is 100 × (cost − BKS) / BKS, where BKS is the best known solution value published for the instance in the literature (<a href="learn.html#bks">see the note on BKS values</a>). A negative gap means the run found a cheaper solution than the published one.</p>
+  <p><strong>How it runs.</strong> The engine is compiled to WebAssembly and runs inside your browser, one Web Worker per seed slot. Nothing is sent to a server. Runs with the same seed, settings and time-independent budget give the same result on any computer; with a time limit the number of iterations done depends on the speed of your device, so costs can differ slightly between devices.</p>
+  <p><strong>Estimated time.</strong> number of seeds ÷ parallel workers (rounded up) × (time limit + about 1 s start-up). It is accurate to roughly ±50% if your computer is busy with other work. Browsers may slow down background tabs: keep this tab in front during a run.</p>
+</section>
+</main>
+
+<footer><div class="wrap"><span id="foot">CLRP Solver</span></div></footer>
+
+<script src="js/engine.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

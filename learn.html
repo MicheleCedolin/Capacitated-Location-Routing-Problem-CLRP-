@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLRP Solver: Learn</title>
+<meta name="description" content="The capacitated location-routing problem, the heuristics and local-search operators of the CLRP Solver, and the literature behind them.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <h1>CLRP Solver</h1>
+  <nav><a href="index.html">Solver</a><a href="learn.html" aria-current="page">Learn</a></nav>
+  <p class="tagline">What the problem is, how each heuristic and local-search operator works, and which papers they come from.</p>
+</div></header>
+
+<main class="wrap learn">
+<noscript><p class="err">This page needs JavaScript.</p></noscript>
+<ul class="jump">
+  <li><a href="#problem">The problem</a></li><li><a href="#data">Instances and best known values</a></li><li><a href="#heuristics">Heuristic families</a></li>
+  <li><a href="#local-search">Local search</a></li><li><a href="#operators">Operators</a></li><li><a href="#literature">Literature matrix</a></li><li><a href="#references">References</a></li>
+</ul>
+
+<h2 class="sec" id="problem">The capacitated location-routing problem</h2>
+<p>A company must decide <strong>where to open depots</strong> and <strong>how to route vehicles</strong> from those depots to customers. The two decisions depend on each other: a cheap depot far from its customers makes expensive routes, and a central depot may cost too much to open. The capacitated location-routing problem (CLRP) asks for the cheapest combination.</p>
+<div class="grid2">
+  <div>
+    <h3>Objective</h3>
+    <p>Minimise the total of three costs:</p>
+    <ol><li><strong>Depot opening costs</strong> of the depots that are used,</li><li><strong>Fixed vehicle costs</strong>, one amount for every route (vehicle) used, and</li><li><strong>Routing costs</strong>, the length of all routes.</li></ol>
+    <h3>Constraints</h3>
+    <ul>
+      <li><strong>Single assignment.</strong> Every customer is visited exactly once, by one route, and its whole demand is delivered.</li>
+      <li><strong>Vehicle capacity.</strong> The demands on one route add up to at most the vehicle capacity <em>Q</em>.</li>
+      <li><strong>Depot capacity.</strong> The demands on all routes of one depot add up to at most the capacity of that depot, and only open depots can serve routes.</li>
+      <li><strong>Route–depot consistency.</strong> A route starts and ends at the same depot.</li>
+    </ul>
+  </div>
+  <div><div class="chart anim" id="fig-problem" aria-label="A solution of instance coord20-5-1"></div><p class="hint">A solution of the 20-customer instance coord20-5-1 found in the browser: filled squares are open depots, hollow squares closed ones, each colour is one route.</p></div>
+</div>
+<h3>Notation</h3>
+<div class="eq">I  candidate depots, with opening cost f_i and capacity W_i
+J  customers, with demand q_j      Q  vehicle capacity      F  fixed cost of one vehicle
+R  routes; route r serves depot d(r), visits customers J_r and has length c(r)
+
+minimise   Σ_i f_i·y_i  +  F·|R|  +  Σ_r c(r)
+
+subject to  every customer j belongs to exactly one J_r
+            Σ_(j in J_r) q_j  ≤  Q                          for every route r
+            Σ_(r : d(r)=i) Σ_(j in J_r) q_j  ≤  W_i·y_i      for every depot i
+            y_i = 1 if some route uses depot i, otherwise 0
+            route r = (d(r), j_1, ..., j_k, d(r))</div>
+<p>Distances are Euclidean. In the P instances they are multiplied by 100 and rounded up to whole numbers, as in the code and data of <span data-ref="he25cd"></span>; the B and T instances use real distances (see <a href="#formats">file formats</a>). The solver does not limit the number of vehicles or depots: both come out of the optimisation. The problem is NP-hard, so large instances are solved by heuristics. The surveys of <span data-ref="nagy07"></span>, <span data-ref="prodhon14"></span> and <span data-ref="schneider17"></span> give the full picture; <span data-ref="baldacci11"></span>, <span data-ref="belenguer11"></span> and <span data-ref="contardo14a"></span> are the main exact methods.</p>
+
+<h2 class="sec" id="data">Instances and best known values</h2>
+<div id="data-table"></div>
+<h3 id="bks">About the best known solution (BKS)</h3>
+<p>The BKS of an instance is the lowest cost we took from the published tables of the literature (mainly <span data-ref="he25"></span>, together with the tables of <span data-ref="schneider17"></span>, <span data-ref="loffler23"></span> and <span data-ref="baldacci11"></span>). These values are <strong>published snapshots, not certified optima</strong> and not guaranteed to be the current global best: a run can legitimately end with a <em>negative</em> gap. <strong>Caveat for the P instances:</strong> the documentation of the set and the HGAMP code differ on the rounding of distances (rounded down against rounded up). This site rounds up, like the HGAMP code, and this point is still to be reconciled; compare gaps on P instances with care. The gap on the Solver page is 100 × (cost − BKS) / BKS.</p>
+<h3 id="formats">File formats for your own instances</h3>
+<p>The Solver reads two kinds of files.</p>
+<p><strong>Benchmark <code>.dat</code> layout.</strong> Blocks separated by blank lines. Block 1: number of customers <em>n</em> and number of depots <em>m</em>. Then either (B and P files) the depot coordinates (<em>m</em> lines), the customer coordinates (<em>n</em> lines), or (T files) all coordinates in one block, depots first. Then: vehicle capacity, depot capacities (<em>m</em> values), customer demands (<em>n</em> values), depot opening costs (<em>m</em> values), the fixed cost of a vehicle, and a final flag: 0 means distances are rounded up after multiplying by 100, any other value means real Euclidean distances.</p>
+<p><strong>Simple <code>.json</code> layout.</strong> Distances are rounded up after multiplying by 100. Download the example from the Solver page and edit it:</p>
+<div class="eq">{ "vehicle_capacity": 40, "vehicle_costs": 20,
+  "depots":    [ { "x": 10, "y": 10, "capacity": 70, "costs": 100 }, ... ],
+  "customers": [ { "x": 20, "y": 15, "demand": 12 }, ... ] }</div>
+<p class="hint">Uploads are processed in your browser and are never sent anywhere. Files are limited to 5 MB, 500 customers and 50 depots.</p>
+
+<h2 class="sec" id="heuristics">Heuristic families</h2>
+<p>The Solver offers 18 heuristics. They differ mainly in how they leave a local optimum. Each family below has a small animation of its typical behaviour; they are illustrations, not results of a real run.</p>
+<div id="families"></div>
+
+<h2 class="sec" id="local-search">Local search</h2>
+<p>A <em>local search</em> improves a solution by repeating small changes (<em>moves</em>) as long as one of them lowers the cost. A <em>move selection rule</em> decides how the operators are tried. Pick a rule and press <strong>Play</strong> to see the descent loop on a made-up problem with five operators; every “improvement” is invented, only the control flow is real.</p>
+<div class="row"><div><label for="drv-sel">Move selection</label><select id="drv-sel"></select></div><div><button id="drv-play" class="small" type="button">Play</button> <button id="drv-step" class="small" type="button">Step</button> <button id="drv-reset" class="small" type="button">Reset</button></div></div>
+<div class="card" id="drv-card"></div>
+<div class="anim" id="drv-anim" style="padding:12px"></div>
+
+<h2 class="sec" id="operators">Local-search operators</h2>
+<p>An operator defines a <em>neighbourhood</em>: the set of solutions reachable by one kind of move. Each card shows a small example with the cost before and after the move. The table below lists which operators each preset contains.</p>
+<div id="op-presets"></div>
+<div id="ops"></div>
+
+<h2 class="sec" id="literature">Where the operators appear in the literature</h2>
+<p>The matrix compares our operators with the neighbourhoods described in CLRP papers. <strong>✓</strong> the paper describes this move; <strong>≈</strong> a similar, partial or implicit counterpart (see the notes); <strong>·</strong> not found in the sections we read. A dagger (†) marks papers we did not re-read for this site: their column rests on secondary information, so “·” there means “not checked”. The cells state what a paper contains; they do not rank the methods.</p>
+<div id="matrix"></div>
+<ul class="small" id="matrix-notes">
+  <li>Prins et al. and Duhamel et al. use three neighbourhoods (MOVE, SWAP, OPT) with a first-improving rule and keep the depot set fixed during local search.</li>
+  <li>Löffler et al. use a VND over 13 operators in a fixed order (Relocate, Exchange, Split and 2-opt* variants) and a separate refinement of the depot configuration; their single-operator removal test is the basis of the operator list here.</li>
+  <li>“Reassign a route to another depot” has no separate counterpart in these papers; the reassignment of trips to depots is implicit in their 2-opt move between routes of different depots.</li>
+  <li>The column “Survey 2014” rests on the survey of Prodhon and Prins, which describes the neighbourhoods of Jarboui et al. and of Yu et al.</li>
+  <li>The reversed-tail and reversed-pair variants (<em>_rev</em>) are our own extensions of the basic moves.</li>
+  <li>Our operators scan the whole neighbourhood (no granular pruning) and accept only feasible solutions; some of the cited papers use granular neighbourhoods or allow temporary capacity violations.</li>
+</ul>
+
+<h2 class="sec" id="references">References</h2>
+<p class="small muted">DOIs were checked against the Crossref record (title, journal, volume, pages) in November 2026. Entries without a DOI are books, chapters or theses. “not verified” marks a citation whose details we could not check.</p>
+<div id="refs"></div>
+</main>
+
+<footer><div class="wrap"><span id="foot">CLRP Solver</span></div></footer>
+<script src="js/charts.js"></script>
+<script src="js/learn.js"></script>
+</body>
+</html>

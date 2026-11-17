@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""Writes data/literature.json. DOIs were checked one by one against the Crossref record on 2026-11-17
+(title, journal, volume and pages compared). Entries without a DOI are books, chapters or theses.
+verified=False means: no DOI check was possible (marked in the page). read=False: the paper was not re-read for this site (marked with a dagger)."""
+import json, sys, os
+
+L = []
+def add(key, authors, year, title, venue, doi=None, group='meta', note='', read=True, verified=None):
+    L.append(dict(key=key, a=authors, y=year, t=title, v=venue, doi=doi, g=group, n=note, read=read, ok=(doi is not None) if verified is None else verified))
+
+# ---- the problem, surveys
+add('min98', 'Min, H., Jayaraman, V., Srivastava, R.', 1998, 'Combined location-routing problems: A synthesis and future research directions', 'European Journal of Operational Research 108(1):1–15', '10.1016/s0377-2217(97)00172-0', 'survey', 'Early synthesis of location-routing models.')
+add('nagy07', 'Nagy, G., Salhi, S.', 2007, 'Location-routing: Issues, models and methods', 'European Journal of Operational Research 177(2):649–672', '10.1016/j.ejor.2006.04.004', 'survey', 'Classification of location-routing problems; reference for depot moves in local search.')
+add('prodhon14', 'Prodhon, C., Prins, C.', 2014, 'A survey of recent research on location-routing problems', 'European Journal of Operational Research 238(1):1–17', '10.1016/j.ejor.2014.01.005', 'survey', 'Survey of models, exact methods and heuristics (including the neighbourhoods of Jarboui et al. and Yu et al.).')
+add('drexl15', 'Drexl, M., Schneider, M.', 2015, 'A survey of variants and extensions of the location-routing problem', 'European Journal of Operational Research 241(2):283–308', '10.1016/j.ejor.2014.08.030', 'survey', 'Variants and extensions of the problem.')
+add('schneider17', 'Schneider, M., Drexl, M.', 2017, 'A survey of the standard location-routing problem', 'Annals of Operations Research 259:389–414', '10.1007/s10479-017-2509-0', 'survey', 'Survey of the standard (capacitated) problem and its benchmark sets.')
+# ---- exact methods
+add('baldacci11', 'Baldacci, R., Mingozzi, A., Wolfler Calvo, R.', 2011, 'An exact method for the capacitated location-routing problem', 'Operations Research 59(5):1284–1296', '10.1287/opre.1110.0989', 'exact', 'Set-partitioning based exact method; optimal values for many P and B instances.')
+add('belenguer11', 'Belenguer, J.-M., Benavent, E., Prins, C., Prodhon, C., Wolfler Calvo, R.', 2011, 'A branch-and-cut method for the capacitated location-routing problem', 'Computers & Operations Research 38(6):931–941', '10.1016/j.cor.2010.09.019', 'exact', 'Branch-and-cut on a two-index formulation.')
+add('contardo13', 'Contardo, C., Cordeau, J.-F., Gendron, B.', 2013, 'A computational comparison of flow formulations for the capacitated location-routing problem', 'Discrete Optimization 10(4):263–295', '10.1016/j.disopt.2013.07.005', 'exact', 'Compares flow formulations.')
+add('contardo14a', 'Contardo, C., Cordeau, J.-F., Gendron, B.', 2014, 'An exact algorithm based on cut-and-column generation for the capacitated location-routing problem', 'INFORMS Journal on Computing 26(1):88–102', '10.1287/ijoc.2013.0549', 'exact', 'Cut-and-column generation.')
+# ---- heuristics for the CLRP
+add('tuzun99', 'Tüzün, D., Burke, L. I.', 1999, 'A two-phase tabu search approach to the location routing problem', 'European Journal of Operational Research 116(1):87–99', '10.1016/s0377-2217(98)00107-6', 'heur', 'Two-phase tabu search; source of the T instance set.')
+add('prins06a', 'Prins, C., Prodhon, C., Wolfler Calvo, R.', 2006, 'Solving the capacitated location-routing problem by a GRASP complemented by a learning process and a path relinking', '4OR 4(3):221–238', '10.1007/s10288-006-0001-9', 'heur', 'GRASP with learning and path relinking; source of the P instance set; local search with MOVE, SWAP and OPT moves.')
+add('prins06b', 'Prins, C., Prodhon, C., Wolfler Calvo, R.', 2006, 'A memetic algorithm with population management (MA|PM) for the capacitated location-routing problem', 'Evolutionary Computation in Combinatorial Optimization (EvoCOP 2006), LNCS 3906:183–194', '10.1007/11730095_16', 'heur', 'Memetic algorithm with population management.', read=False)
+add('prins07', 'Prins, C., Prodhon, C., Ruiz, A., Soriano, P., Wolfler Calvo, R.', 2007, 'Solving the capacitated location-routing problem by a cooperative Lagrangean relaxation-granular tabu search heuristic', 'Transportation Science 41(4):470–483', '10.1287/trsc.1060.0187', 'heur', 'Lagrangean relaxation and granular tabu search.', read=False)
+add('duhamel10', 'Duhamel, C., Lacomme, P., Prins, C., Prodhon, C.', 2010, 'A GRASP×ELS approach for the capacitated location-routing problem', 'Computers & Operations Research 37(11):1912–1923', '10.1016/j.cor.2009.07.004', 'heur', 'GRASP with evolutionary local search; first-improvement MOVE, SWAP and OPT neighbourhoods.')
+add('yu10', 'Yu, V. F., Lin, S.-W., Lee, W., Ting, C.-J.', 2010, 'A simulated annealing heuristic for the capacitated location routing problem', 'Computers & Industrial Engineering 58(2):288–299', '10.1016/j.cie.2009.10.007', 'heur', 'Simulated annealing whose moves may involve depot nodes.', read=False)
+add('escobar13', 'Escobar, J. W., Linfati, R., Toth, P.', 2013, 'A two-phase hybrid heuristic algorithm for the capacitated location-routing problem', 'Computers & Operations Research 40(1):70–79', '10.1016/j.cor.2012.05.008', 'heur', 'Granular tabu search in the improvement phase; Shift, Swap and inter-tour exchange moves.')
+add('jarboui13', 'Jarboui, B., Derbel, H., Hanafi, S., Mladenović, N.', 2013, 'Variable neighborhood search for location routing', 'Computers & Operations Research 40(1):47–57', '10.1016/j.cor.2012.05.009', 'heur', 'VNS with a neighbourhood that exchanges the open/closed status of two depots (as described in the survey of Prodhon and Prins).', read=False)
+add('ting13', 'Ting, C.-J., Chen, C.-H.', 2013, 'A multiple ant colony optimization algorithm for the capacitated location routing problem', 'International Journal of Production Economics 141(1):34–44', '10.1016/j.ijpe.2012.06.011', 'heur', 'Ant colony optimisation for the CLRP.', read=False)
+add('contardo14b', 'Contardo, C., Cordeau, J.-F., Gendron, B.', 2014, 'A GRASP + ILP-based metaheuristic for the capacitated location-routing problem', 'Journal of Heuristics 20(1):1–38', '10.1007/s10732-013-9230-1', 'heur', 'GRASP combined with integer programming.', read=False)
+add('loffler23', 'Löffler, M., Bartolini, E., Schneider, M.', 2023, 'A conceptually simple algorithm for the capacitated location-routing problem', 'EURO Journal on Computational Optimization 11:100063', '10.1016/j.ejco.2023.100063', 'heur', 'GRASP with a 13-operator VND (Table 1) and a depot-configuration refinement; operator ablation on the P, B and T sets.')
+add('he25', 'He, P., Hao, J.-K., Wu, Q.', 2026, 'A hybrid genetic algorithm with multi-population for capacitated location routing (HGAMP)', 'INFORMS Journal on Computing 38(3):829–843 (online 2025)', '10.1287/ijoc.2023.0416', 'heur', 'Source of many best known values used on this site. Open code and data: see the repository record below.', read=False)
+add('he25cd', 'He, P., Hao, J.-K., Wu, Q.', 2025, 'Code and data repository for “A hybrid genetic algorithm with multi-population for capacitated location routing”', 'INFORMS Journal on Computing (code and data repository)', '10.1287/ijoc.2023.0416.cd', 'open', 'Open code and data of HGAMP (INFORMS JoC repository).', read=False)
+# ---- related
+add('zou24', 'Zou, Y. et al.', 2024, 'A reinforcement learning guided hybrid evolutionary algorithm for the latency location routing problem', 'Computers & Operations Research 170:106758', '10.1016/j.cor.2024.106758', 'related', 'Latency variant (LLRP); discusses fixed against learned operator order in VND.', read=False)
+add('vidal22', 'Vidal, T.', 2022, 'Hybrid genetic search for the CVRP: Open-source implementation and SWAP* neighborhood', 'Computers & Operations Research 140:105643', '10.1016/j.cor.2021.105643', 'related', 'Open-source implementation of HGS for the CVRP; Swap and SWAP* neighbourhoods.', read=False)
+# ---- benchmark sources
+add('barreto07', 'Barreto, S., Ferreira, C., Paixão, J., Santos, B. S.', 2007, 'Using clustering analysis in a capacitated location-routing problem', 'European Journal of Operational Research 179(3):968–977', '10.1016/j.ejor.2005.06.074', 'bench', 'Source of the B instance set (adapted classical test data).')
+# ---- metaheuristic foundations (those named in the heuristic cards)
+add('dorigo96', 'Dorigo, M., Maniezzo, V., Colorni, A.', 1996, 'Ant system: optimization by a colony of cooperating agents', 'IEEE Transactions on Systems, Man, and Cybernetics, Part B 26(1):29–41', '10.1109/3477.484436', 'meta')
+add('ropke06', 'Ropke, S., Pisinger, D.', 2006, 'An adaptive large neighborhood search heuristic for the pickup and delivery problem with time windows', 'Transportation Science 40(4):455–472', '10.1287/trsc.1050.0135', 'meta')
+add('goncalves11', 'Gonçalves, J. F., Resende, M. G. C.', 2011, 'Biased random-key genetic algorithms for combinatorial optimization', 'Journal of Heuristics 17(5):487–525', '10.1007/s10732-010-9143-1', 'meta')
+add('bean94', 'Bean, J. C.', 1994, 'Genetic algorithms and random keys for sequencing and optimization', 'ORSA Journal on Computing 6(2):154–160', '10.1287/ijoc.6.2.154', 'meta')
+add('storn97', 'Storn, R., Price, K.', 1997, 'Differential evolution – a simple and efficient heuristic for global optimization over continuous spaces', 'Journal of Global Optimization 11(4):341–359', '10.1023/a:1008202821328', 'meta')
+add('holland75', 'Holland, J. H.', 1975, 'Adaptation in natural and artificial systems', 'University of Michigan Press, Ann Arbor', None, 'meta', 'Book (no DOI).')
+add('feo95', 'Feo, T. A., Resende, M. G. C.', 1995, 'Greedy randomized adaptive search procedures', 'Journal of Global Optimization 6(2):109–133', '10.1007/bf01096763', 'meta')
+add('ruiz07', 'Ruiz, R., Stützle, T.', 2007, 'A simple and effective iterated greedy algorithm for the permutation flowshop scheduling problem', 'European Journal of Operational Research 177(3):2033–2049', '10.1016/j.ejor.2005.12.009', 'meta')
+add('lourenco03', 'Lourenço, H. R., Martin, O. C., Stützle, T.', 2003, 'Iterated local search', 'In: Glover, F., Kochenberger, G. A. (eds.) Handbook of Metaheuristics, Springer, pp. 320–353', '10.1007/0-306-48056-5_11', 'meta')
+add('shaw98', 'Shaw, P.', 1998, 'Using constraint programming and local search methods to solve vehicle routing problems', 'Principles and Practice of Constraint Programming – CP98, LNCS 1520:417–431', '10.1007/3-540-49481-2_30', 'meta')
+add('pisinger10', 'Pisinger, D., Ropke, S.', 2010, 'Large neighborhood search', 'In: Gendreau, M., Potvin, J.-Y. (eds.) Handbook of Metaheuristics, 2nd ed., Springer, pp. 399–419', '10.1007/978-1-4419-1665-5_13', 'meta')
+add('marti13', 'Martí, R., Resende, M. G. C., Ribeiro, C. C.', 2013, 'Multi-start methods for combinatorial optimization', 'European Journal of Operational Research 226(1):1–8', '10.1016/j.ejor.2012.10.012', 'meta')
+add('kennedy95', 'Kennedy, J., Eberhart, R.', 1995, 'Particle swarm optimization', 'Proceedings of ICNN’95 – International Conference on Neural Networks 4:1942–1948', '10.1109/icnn.1995.488968', 'meta')
+add('kirkpatrick83', 'Kirkpatrick, S., Gelatt, C. D., Vecchi, M. P.', 1983, 'Optimization by simulated annealing', 'Science 220(4598):671–680', '10.1126/science.220.4598.671', 'meta')
+add('glover77', 'Glover, F.', 1977, 'Heuristics for integer programming using surrogate constraints', 'Decision Sciences 8(1):156–166', '10.1111/j.1540-5915.1977.tb01074.x', 'meta')
+add('laguna03', 'Laguna, M., Martí, R.', 2003, 'Scatter search: Methodology and implementations in C', 'Kluwer Academic Publishers', None, 'meta', 'Book (no DOI).')
+add('dueck90', 'Dueck, G., Scheuer, T.', 1990, 'Threshold accepting: A general purpose optimization algorithm appearing superior to simulated annealing', 'Journal of Computational Physics 90(1):161–175', '10.1016/0021-9991(90)90201-b', 'meta')
+add('glover89', 'Glover, F.', 1989, 'Tabu search – Part I', 'ORSA Journal on Computing 1(3):190–206', '10.1287/ijoc.1.3.190', 'meta')
+add('mladenovic97', 'Mladenović, N., Hansen, P.', 1997, 'Variable neighborhood search', 'Computers & Operations Research 24(11):1097–1100', '10.1016/s0305-0548(97)00031-2', 'meta')
+add('hansen01', 'Hansen, P., Mladenović, N.', 2001, 'Variable neighborhood search: Principles and applications', 'European Journal of Operational Research 130(3):449–467', '10.1016/s0377-2217(00)00100-4', 'meta')
+# ---- local-search operators
+add('or76', 'Or, I.', 1976, 'Traveling salesman-type combinatorial problems and their relation to the logistics of regional blood banking', 'PhD thesis, Northwestern University, Evanston', None, 'ops', 'Thesis (no DOI).')
+add('croes58', 'Croes, G. A.', 1958, 'A method for solving traveling-salesman problems', 'Operations Research 6(6):791–812', '10.1287/opre.6.6.791', 'ops')
+add('osman93', 'Osman, I. H.', 1993, 'Metastrategy simulated annealing and tabu search algorithms for the vehicle routing problem', 'Annals of Operations Research 41:421–451', '10.1007/bf02023004', 'ops')
+add('potvin95', 'Potvin, J.-Y., Rousseau, J.-M.', 1995, 'An exchange heuristic for routeing problems with time windows', 'Journal of the Operational Research Society 46(12):1433–1446', '10.1057/jors.1995.204', 'ops')
+add('taillard97', 'Taillard, É., Badeau, P., Gendreau, M., Guertin, F., Potvin, J.-Y.', 1997, 'A tabu search heuristic for the vehicle routing problem with soft time windows', 'Transportation Science 31(2):170–186', '10.1287/trsc.31.2.170', 'ops')
+add('kinder97', 'Kindervater, G. A. P., Savelsbergh, M. W. P.', 1997, 'Vehicle routing: handling edge exchanges', 'In: Aarts, E., Lenstra, J. K. (eds.) Local Search in Combinatorial Optimization, Wiley', None, 'ops', 'Book chapter (no DOI). Citation details not verified.', verified=False)
+
+out = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'literature.json')
+json.dump(L, open(out, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+print(len(L), 'entries;', sum(1 for x in L if x['doi']), 'with a verified DOI;', sum(1 for x in L if not x['read']), 'marked with a dagger')
+
+# ---- which references each heuristic card and operator card shows, and the literature matrix (cell meaning: y = described in the paper as read, p = similar or partly, n = not found in the parts we checked)
+MAP = {
+ 'heur': {
+  'aco': {'m': ['dorigo96'], 'c': ['ting13']}, 'alns': {'m': ['ropke06'], 'c': []}, 'brkga': {'m': ['goncalves11', 'bean94'], 'c': []}, 'de': {'m': ['storn97', 'bean94'], 'c': []},
+  'ga': {'m': ['holland75'], 'c': ['prins06b', 'he25']}, 'grasp': {'m': ['feo95'], 'c': ['prins06a', 'duhamel10', 'contardo14b', 'loffler23']}, 'grasppr': {'m': ['feo95'], 'c': ['prins06a']},
+  'ig': {'m': ['ruiz07'], 'c': []}, 'ils': {'m': ['lourenco03'], 'c': ['duhamel10']}, 'lns': {'m': ['shaw98', 'pisinger10'], 'c': []}, 'msls': {'m': ['marti13'], 'c': []},
+  'pso': {'m': ['kennedy95', 'bean94'], 'c': []}, 'rkrs': {'m': ['bean94'], 'c': []}, 'sa': {'m': ['kirkpatrick83'], 'c': ['yu10']}, 'scatter': {'m': ['glover77', 'laguna03'], 'c': ['prins06a']},
+  'ta': {'m': ['dueck90'], 'c': []}, 'tabu': {'m': ['glover89'], 'c': ['tuzun99', 'prins07']}, 'vns': {'m': ['mladenovic97', 'hansen01'], 'c': ['jarboui13']}},
+ 'op': {
+  'intra_relocate1': ['or76', 'kinder97'], 'intra_relocate2': ['or76', 'kinder97'], 'intra_swap11': ['kinder97'], 'intra_2opt': ['croes58'], 'depot_reassign': ['prins06a', 'nagy07'],
+  'inter_relocate1': ['kinder97', 'osman93'], 'inter_relocate2': ['kinder97', 'osman93'], 'inter_relocate2_rev': ['kinder97', 'osman93'], 'inter_swap11': ['kinder97', 'osman93'],
+  'inter_swap21': ['osman93', 'taillard97'], 'inter_swap22': ['osman93', 'taillard97'], 'inter_swap22_rev': ['osman93', 'taillard97'], 'two_opt_star': ['potvin95'], 'two_opt_star_rev': ['potvin95'],
+  'route_split': ['prins06a'], 'depot_close': ['prins06a', 'nagy07'], 'depot_move_all': ['prins06a', 'nagy07'], 'depot_open': ['prins06a', 'nagy07']}}
+COLS = [('prins06a', 'Prins et al. 2006a'), ('duhamel10', 'Duhamel et al. 2010'), ('escobar13', 'Escobar et al. 2013'), ('loffler23', 'Löffler et al. 2023'), ('prodhon14', 'Survey 2014 (Jarboui, Yu)'), ('vidal22', 'Vidal 2022')]
+# rows follow our reading of the papers (project note of 2026-10-29); y = verified in the text, p = similar / partly / implicit, n = not found in the sections read; a dagger column was not re-read
+M = {
+ 'intra_relocate1': 'y y y y n n', 'inter_relocate1': 'y y y y n n', 'intra_swap11': 'y y y y n n', 'inter_swap11': 'y y y y n n', 'intra_2opt': 'y y n n n n',
+ 'two_opt_star': 'y y n y n n', 'two_opt_star_rev': 'n n n n n n',
+ 'intra_relocate2': 'n n n y n p', 'inter_relocate2': 'n n n y n p', 'inter_relocate2_rev': 'n n n n n n',
+ 'inter_swap21': 'n n n n n p', 'inter_swap22': 'n n y p n p', 'inter_swap22_rev': 'n n n n n n',
+ 'route_split': 'n n n p n n', 'depot_reassign': 'p p n n n n',
+ 'depot_close': 'n n n p p n', 'depot_move_all': 'n n n n p n', 'depot_open': 'n n n n p n'}
+json.dump({'map': MAP, 'cols': COLS, 'matrix': {k: v.split() for k, v in M.items()}}, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'learn_map.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
