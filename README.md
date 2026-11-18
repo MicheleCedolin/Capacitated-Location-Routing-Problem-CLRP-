@@ -28,9 +28,9 @@ tests/                        headless-browser and Node tests (not deployed)
 
 ## Deploy
 
-1. Create the repository (name `CLRP`) under your account and push this folder to `main`.
+1. Create a repository (any name) under your account and push this folder to `main`.
 2. Settings → Pages → Source: **GitHub Actions**. The workflow publishes `index.html`, `learn.html`, `css`, `js`,
-   `wasm` and `data` to `https://<account>.github.io/CLRP/`.
+   `wasm` and `data` to `https://<account>.github.io/<repository>/`. Renaming the repository changes this address; the old address then returns 404.
 3. All paths are relative, so the site also works from any other sub-path or from a local static server
    (`python3 -m http.server`; opening the files with `file://` does not work because of `fetch`).
 
