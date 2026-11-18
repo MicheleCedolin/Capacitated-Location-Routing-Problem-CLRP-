@@ -96,7 +96,7 @@
   <h2>About this solver</h2>
   <p><strong>Problem.</strong> Each solution opens a set of depots, uses vehicles of limited capacity and visits every customer exactly once. The cost is <em>depot opening costs + fixed vehicle costs + routing costs</em>. A route starts and ends at the same depot, its load may not exceed the vehicle capacity, and the load of all routes of a depot may not exceed the depot capacity. <a href="learn.html#problem">Read the model on the Learn page.</a></p>
   <p><strong>Gap.</strong> The gap is <span class="math">gap = 100 × <span class="frac"><span><i>z</i> − <i>z</i><sub>BKS</sub></span><span><i>z</i><sub>BKS</sub></span></span> %</span>, where <i>z</i> is the cost of the solution and <i>z</i><sub>BKS</sub> is the best known solution value published for the instance in the literature (<a href="learn.html#bks">see the note on BKS values</a>). A negative gap means the run found a cheaper solution than the published one.</p>
-  <p><strong>How it runs.</strong> The engine is compiled to WebAssembly and runs inside your browser, one Web Worker per seed slot. Nothing is sent to a server. Runs with the same seed, settings and time-independent budget give the same result on any computer; with a time limit the number of iterations done depends on the speed of your device, so costs can differ slightly between devices.</p>
+  <p><strong>How it runs.</strong> The engine is compiled to WebAssembly and runs inside your browser, one Web Worker per seed slot. Your instances and settings are never sent to a server; the page only reports two anonymous counts (page opened, run started) to <a href="https://www.goatcounter.com">GoatCounter</a>, an analytics service that does not track personal data. Runs with the same seed, settings and time-independent budget give the same result on any computer; with a time limit the number of iterations done depends on the speed of your device, so costs can differ slightly between devices.</p>
   <p><strong>Estimated time.</strong> number of seeds ÷ parallel workers (rounded up) × (time limit + about 1 s start-up). It is accurate to roughly ±50% if your computer is busy with other work. Browsers may slow down background tabs: keep this tab in front during a run.</p>
 </section>
 </main>
@@ -106,5 +106,6 @@
 <script src="js/engine.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/app.js"></script>
+<script data-goatcounter="https://michelecedolin.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

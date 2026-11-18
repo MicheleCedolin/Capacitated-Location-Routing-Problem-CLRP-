@@ -151,10 +151,14 @@
     return { instance: state.inst.id, fam: state.inst.family, file: state.inst.file, custom: state.custom, heuristic: hid, local_search: ls, neighborhoods: nb, operators: ls === 'none' ? [] : state.ops.slice(), time_limit: T, checkpoints: ck, params: own, seeds, workers: Math.min(r.w, r.seeds) };
   }
   function setRunning(on) { $('run').disabled = on; $('cancel').disabled = !on; ['inst-sel', 'heur-sel', 'ls-sel', 'preset-sel', 'op-add', 'seed0', 'nseeds', 'tlim', 'nwork'].forEach(id => $(id).disabled = on); }
+  // Anonymous usage count (GoatCounter): only the event name is sent, never instances, settings or results.
+  function track(name) { try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: name, event: true }); } catch (e) { /* counting is optional */ } }
+
   $('run').onclick = async () => {
     $('run-err').textContent = ''; let spec; try { spec = buildSpec(); } catch (e) { $('run-err').textContent = e.message; return; }
     const wall = Math.ceil(spec.seeds.length / spec.workers) * (spec.time_limit + 1);
     if (wall > 120 && !confirm(`This run will take about ${(wall / 60).toFixed(1)} minutes and keep ${spec.workers} processor core(s) busy. Keep this tab open and in front. Start?`)) return;
+    track('solve-clrp');
     state.results = []; state.runSpec = spec; renderResults(); setRunning(true); $('bar').hidden = false; $('bar').firstElementChild.style.width = '0%'; $('status').textContent = 'Starting the engine…';
     const ctx = { catalog, instBytes: state.bytes, refRecord: state.inst.bks ? { problem: 'CLRP', family: state.inst.family, instance_id: state.inst.id, reference_best: state.inst.bks, status: state.inst.status } : null };
     let done = 0; const t0 = performance.now();

@@ -10,7 +10,7 @@ A static web site with two pages:
   and the reference list (DOIs checked against Crossref; entries not re-read are marked †).
 
 The solver is the C++ engine of the CLRP lab application compiled to WebAssembly (`wasm/clrp.wasm`). It runs in a
-Web Worker pool inside the visitor's browser; nothing is sent to a server.
+Web Worker pool inside the visitor's browser; no instance data is sent to a server (the live page only reports two anonymous counts, page opened and run started, to GoatCounter).
 
 ## Layout
 
