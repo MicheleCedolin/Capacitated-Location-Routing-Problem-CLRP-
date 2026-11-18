@@ -39,24 +39,50 @@
   </div>
   <div><div class="chart anim" id="fig-problem" aria-label="A solution of instance coord20-5-1"></div><p class="hint">A solution of the 20-customer instance coord20-5-1 found in the browser: filled squares are open depots, hollow squares closed ones, each colour is one route.</p></div>
 </div>
-<h3>Notation</h3>
-<div class="eq">I  candidate depots, with opening cost f_i and capacity W_i
-J  customers, with demand q_j      Q  vehicle capacity      F  fixed cost of one vehicle
-R  routes; route r serves depot d(r), visits customers J_r and has length c(r)
-
-minimise   Σ_i f_i·y_i  +  F·|R|  +  Σ_r c(r)
-
-subject to  every customer j belongs to exactly one J_r
-            Σ_(j in J_r) q_j  ≤  Q                          for every route r
-            Σ_(r : d(r)=i) Σ_(j in J_r) q_j  ≤  W_i·y_i      for every depot i
-            y_i = 1 if some route uses depot i, otherwise 0
-            route r = (d(r), j_1, ..., j_k, d(r))</div>
+<h3>Mathematical model</h3>
+<p>The problem is written below as a set-partitioning model over routes, the form on which the exact method of <span data-ref="baldacci11"></span> is built. The heuristics on this site never build this model: they search over routes directly.</p>
+<table class="nota math" aria-label="Notation">
+<tr class="grp"><td colspan="2">Sets</td></tr>
+<tr><td><i>I</i></td><td>candidate depots, indexed by <i>i</i></td></tr>
+<tr><td><i>J</i></td><td>customers, indexed by <i>j</i></td></tr>
+<tr><td>Ω<sub><i>i</i></sub></td><td>feasible routes of depot <i>i</i>, defined below</td></tr>
+<tr class="grp"><td colspan="2">Data</td></tr>
+<tr><td><i>f</i><sub><i>i</i></sub></td><td>opening cost of depot <i>i</i></td></tr>
+<tr><td><i>W</i><sub><i>i</i></sub></td><td>capacity of depot <i>i</i></td></tr>
+<tr><td><i>q</i><sub><i>j</i></sub></td><td>demand of customer <i>j</i></td></tr>
+<tr><td><i>Q</i></td><td>capacity of one vehicle</td></tr>
+<tr><td><i>F</i></td><td>fixed cost of one vehicle, paid once for every route</td></tr>
+<tr><td><i>d</i><sub><i>uv</i></sub></td><td>distance between two nodes <i>u</i>, <i>v</i> ∈ <i>I</i> ∪ <i>J</i></td></tr>
+<tr class="grp"><td colspan="2">Decision variables</td></tr>
+<tr><td><i>x</i><sub><i>r</i></sub></td><td>1 if route <i>r</i> is driven, 0 otherwise</td></tr>
+<tr><td><i>y</i><sub><i>i</i></sub></td><td>1 if depot <i>i</i> is open, 0 otherwise</td></tr>
+</table>
+<p>A <strong>route</strong> <i>r</i> ∈ Ω<sub><i>i</i></sub> of depot <i>i</i> is a sequence <span class="math">(<i>i</i>, <i>j</i><sub>1</sub>, …, <i>j</i><sub><i>k</i></sub>, <i>i</i>)</span> of <i>k</i> ≥ 1 distinct customers. Its demand must not exceed <i>Q</i>, and its length is the total distance driven:</p>
+<div class="model math" role="group" aria-label="Route demand and length">
+<div class="row"><span><i>q</i><sub><i>r</i></sub> = <span class="sum"><span class="lim"><i>k</i></span><span class="op">∑</span><span class="lim"><i>t</i> = 1</span></span> <i>q</i><sub><i>j</i><sub><i>t</i></sub></sub> &emsp; ≤ &ensp; <i>Q</i></span></div>
+<div class="row"><span><i>c</i><sub><i>r</i></sub> = <i>d</i><sub><i>i</i> <i>j</i><sub>1</sub></sub> + <span class="sum"><span class="lim"><i>k</i> − 1</span><span class="op">∑</span><span class="lim"><i>t</i> = 1</span></span> <i>d</i><sub><i>j</i><sub><i>t</i></sub> <i>j</i><sub><i>t</i>+1</sub></sub> + <i>d</i><sub><i>j</i><sub><i>k</i></sub> <i>i</i></sub></span></div>
+</div>
+<p>The indicator <span class="math"><i>a</i><sub><i>jr</i></sub></span> equals 1 if route <i>r</i> visits customer <i>j</i> and 0 otherwise.</p>
+<div class="model math" role="group" aria-label="Model">
+<div class="row"><span><b>min</b> <span class="sum"><span class="op">∑</span><span class="lim"><i>i</i> ∈ <i>I</i></span></span> <i>f</i><sub><i>i</i></sub> <i>y</i><sub><i>i</i></sub> + <span class="sum"><span class="op">∑</span><span class="lim"><i>i</i> ∈ <i>I</i></span></span> <span class="sum"><span class="op">∑</span><span class="lim"><i>r</i> ∈ Ω<sub><i>i</i></sub></span></span> (<i>F</i> + <i>c</i><sub><i>r</i></sub>) <i>x</i><sub><i>r</i></sub></span><span class="tag">(1)</span></div>
+<div class="row"><span><span class="sum"><span class="op">∑</span><span class="lim"><i>i</i> ∈ <i>I</i></span></span> <span class="sum"><span class="op">∑</span><span class="lim"><i>r</i> ∈ Ω<sub><i>i</i></sub></span></span> <i>a</i><sub><i>jr</i></sub> <i>x</i><sub><i>r</i></sub> = 1 &emsp; ∀ <i>j</i> ∈ <i>J</i></span><span class="tag">(2)</span></div>
+<div class="row"><span><span class="sum"><span class="op">∑</span><span class="lim"><i>r</i> ∈ Ω<sub><i>i</i></sub></span></span> <i>q</i><sub><i>r</i></sub> <i>x</i><sub><i>r</i></sub> ≤ <i>W</i><sub><i>i</i></sub> <i>y</i><sub><i>i</i></sub> &emsp; ∀ <i>i</i> ∈ <i>I</i></span><span class="tag">(3)</span></div>
+<div class="row"><span><i>x</i><sub><i>r</i></sub> ∈ {0, 1} &emsp; ∀ <i>i</i> ∈ <i>I</i>, <i>r</i> ∈ Ω<sub><i>i</i></sub></span><span class="tag">(4)</span></div>
+<div class="row"><span><i>y</i><sub><i>i</i></sub> ∈ {0, 1} &emsp; ∀ <i>i</i> ∈ <i>I</i></span><span class="tag">(5)</span></div>
+</div>
+<ul>
+<li><strong>(1)</strong> minimises the total cost: opening costs of the open depots, one vehicle cost for every route, and the total route length.</li>
+<li><strong>(2)</strong> every customer is visited by exactly one route.</li>
+<li><strong>(3)</strong> the demands on all routes of a depot add up to at most its capacity, and a closed depot (<i>y</i><sub><i>i</i></sub> = 0) serves no route.</li>
+<li><strong>(4), (5)</strong> binary variables. The vehicle capacity <i>Q</i> is part of the definition of Ω<sub><i>i</i></sub>. The number of vehicles and the number of open depots are not limited.</li>
+</ul>
+<p class="hint">The set Ω<sub><i>i</i></sub> grows exponentially with the number of customers, so the model is not solved directly here.</p>
 <p>Distances are Euclidean. In the P instances they are multiplied by 100 and rounded up to whole numbers, as stated by <span data-ref="prins07"></span> and as in the code and data of <span data-ref="he25cd"></span>; the B and T instances use real distances (see <a href="#formats">file formats</a>). The solver does not limit the number of vehicles or depots: both come out of the optimisation. The problem is NP-hard, so large instances are solved by heuristics. The surveys of <span data-ref="nagy07"></span>, <span data-ref="prodhon14"></span> and <span data-ref="schneider17"></span> give the full picture; <span data-ref="baldacci11"></span>, <span data-ref="belenguer11"></span> and <span data-ref="contardo14a"></span> are the main exact methods.</p>
 
 <h2 class="sec" id="data">Instances and best known values</h2>
 <div id="data-table"></div>
 <h3 id="bks">About the best known solution (BKS)</h3>
-<p>The BKS of an instance is the lowest cost we took from the published tables of the literature (mainly <span data-ref="he25"></span>, together with the tables of <span data-ref="schneider17"></span>, <span data-ref="loffler23"></span> and <span data-ref="baldacci11"></span>). These values are <strong>published snapshots, not certified optima</strong> and not guaranteed to be the current global best: a run can legitimately end with a <em>negative</em> gap. <strong>Note on the P instances:</strong> the creators of the set state that distances are multiplied by 100 and rounded up (<span data-ref="prins07"></span>; repeated by <span data-ref="yu10"></span>), which is what this site and the HGAMP code do. One recent preprint says “nearest integer” instead; we follow the creators of the set. The gap on the Solver page is 100 × (cost − BKS) / BKS.</p>
+<p>The BKS of an instance is the lowest cost we took from the published tables of the literature (mainly <span data-ref="he25"></span>, together with the tables of <span data-ref="schneider17"></span>, <span data-ref="loffler23"></span> and <span data-ref="baldacci11"></span>). These values are <strong>published snapshots, not certified optima</strong> and not guaranteed to be the current global best: a run can legitimately end with a <em>negative</em> gap. <strong>Note on the P instances:</strong> the creators of the set state that distances are multiplied by 100 and rounded up (<span data-ref="prins07"></span>; repeated by <span data-ref="yu10"></span>), which is what this site and the HGAMP code do. One recent preprint says “nearest integer” instead; we follow the creators of the set. The gap on the Solver page is <span class="math">gap = 100 × <span class="frac"><span><i>z</i> − <i>z</i><sub>BKS</sub></span><span><i>z</i><sub>BKS</sub></span></span> %</span>, where <i>z</i> is the cost of the solution.</p>
 <h3 id="formats">File formats for your own instances</h3>
 <p>The Solver reads two kinds of files.</p>
 <p><strong>Benchmark <code>.dat</code> layout.</strong> Blocks separated by blank lines. Block 1: number of customers <em>n</em> and number of depots <em>m</em>. Then either (B and P files) the depot coordinates (<em>m</em> lines), the customer coordinates (<em>n</em> lines), or (T files) all coordinates in one block, depots first. Then: vehicle capacity, depot capacities (<em>m</em> values), customer demands (<em>n</em> values), depot opening costs (<em>m</em> values), the fixed cost of a vehicle, and a final flag: 0 means distances are rounded up after multiplying by 100, any other value means real Euclidean distances.</p>

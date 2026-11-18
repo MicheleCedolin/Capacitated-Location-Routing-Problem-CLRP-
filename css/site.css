@@ -80,3 +80,24 @@ ol.refs { padding-left: 24px; font-size: .92rem; } ol.refs li { margin: 6px 0; m
 
 /* Learn page animations and operator pictures */
 .anim svg { width: 100%; height: auto; display: block; } .anim text, .ba svg text { fill: var(--muted); font: 11px var(--font); } .ba svg text { font-size: 9px; }
+
+/* mathematical notation: plain HTML, no external library */
+.math { font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", "Times New Roman", serif; font-size: 1.05rem; }
+.math sub, .math sup { font-size: .72em; line-height: 0; }
+.sum { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1; margin: 0 .2em; }
+.sum .op { font-size: 1.7em; line-height: 1; }
+.sum .lim { font-size: .72em; line-height: 1.15; white-space: nowrap; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; text-align: center; margin: 0 .15em; }
+.frac > span { padding: 0 .3em; white-space: nowrap; }
+.frac > span:first-child { border-bottom: 1px solid currentColor; }
+table.nota { border-collapse: collapse; margin: 6px 0 12px; }
+table.nota td { padding: 2px 18px 2px 0; vertical-align: top; }
+table.nota td:first-child { white-space: nowrap; min-width: 3.2em; }
+table.nota tr.grp td { font-family: var(--sans, inherit); font-size: .8rem; font-weight: 600; color: var(--muted); padding-top: 8px; letter-spacing: .02em; }
+.model { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 16px; overflow-x: auto; margin: 8px 0; }
+.model .row { display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: center; gap: 24px; padding: 10px 0; white-space: nowrap; min-width: max-content; }
+.model .row > span { flex: 0 0 auto; }
+.model .row + .row { border-top: 1px dashed var(--line); }
+.model .tag { color: var(--muted); }
+p i, li i, td i, .math i { font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", "Times New Roman", serif; }
+@media (max-width: 520px) { .model.math { font-size: .88rem; padding: 4px 10px; } .model .row { gap: 8px; } .model .sum .op { font-size: 1.5em; } }
