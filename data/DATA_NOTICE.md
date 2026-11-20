@@ -18,13 +18,16 @@ Full references with DOIs are on the Learn page.
   the **MIT License**, copyright 2025 Pengfei He, Jin-Kao Hao and Qinghua Wu (LICENSE file read). Its README says it contains the
   benchmark instances and the best solutions. An MIT licence on that archive does not by itself show that the original authors
   of the P, B and T sets allowed redistribution.
-- The page of the P instances (prodhonc.free.fr) could not be read from this workspace (blocked for automatic access),
-  so its usage terms are unknown.
+- The instance page of C. Prodhon (http://prodhonc.free.fr/Instances/instances_us.htm, read in a browser on 20 Nov 2026) offers the
+  three sets as archives (Prins et al., Tuzun and Burke, Barreto) with result tables and references. It states no licence and no
+  conditions of use. Its `Format.txt` says that integer costs are "multiplied by 100" and truncated; see the next item.
 - Distance rule of the P instances: **x100 and rounded up.** Stated in the full text of Prins, Prodhon, Ruiz, Soriano and
   Wolfler Calvo (2007), Transportation Science 41(4), whose authors created the set, and repeated in Yu et al. (2010),
   Computers & Industrial Engineering 58(2). Both papers also state that the B and T distances are not rounded. HGAMP certified
-  values reproduce under round-up in our runs. The preprint arXiv:2412.05665 says “rounded to the nearest integer”; an earlier
-  note of ours said “rounded down”; neither is supported by the creators' paper. The site rounds up.
+  values reproduce under round-up in our runs. The preprint arXiv:2412.05665 says “rounded to the nearest integer”, and the
+  `Format.txt` file on the instance page says truncated. Check on coord20-5-1 (20 Nov 2026): the optimal value in the creators' own
+  table is 54793 (routing part 29244 including 5 vehicles); the same solution costs 54793 with rounding up, 54769 with truncation
+  and 54777 with rounding to nearest. Only rounding up reproduces the published optimum. The site rounds up.
 
 ## Still open (repository owner)
 
