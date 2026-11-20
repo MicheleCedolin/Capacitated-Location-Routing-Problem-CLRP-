@@ -11,7 +11,7 @@ def run(pg, label):
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox'])
     pg = b.new_page(viewport={'width': 1100, 'height': 900}); pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None); pg.on('pageerror', lambda e: errs.append('PAGEERROR ' + str(e)))
-    pg.goto(base + 'index.html'); pg.wait_for_selector('#inst-info:not(:empty)')
+    pg.goto(base + 'index.html'); pg.wait_for_selector('#inst-info:not(:empty)'); pg.click('#mode-expert')  # the page opens in Quick start
     pg.check('input[name=isrc][value=upload]')
     pg.set_input_files('#up-file', 'data/instances/' + json.load(open('data/instances.json'))[5]['file'])   # a built-in .dat as an upload
     pg.wait_for_function("document.getElementById('inst-info').textContent.length > 0"); print('dat info:', pg.inner_text('#inst-info'), '| err', repr(pg.inner_text('#up-err')))

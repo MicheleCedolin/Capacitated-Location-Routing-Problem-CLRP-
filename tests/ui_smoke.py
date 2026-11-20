@@ -8,7 +8,7 @@ with sync_playwright() as p:
     pg = b.new_page(viewport={'width': 1100, 'height': 900})
     pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
     pg.on('pageerror', lambda e: errs.append('PAGEERROR ' + str(e)))
-    pg.goto(base + 'index.html'); pg.wait_for_selector('#inst-info:not(:empty)')
+    pg.goto(base + 'index.html'); pg.wait_for_selector('#inst-info:not(:empty)'); pg.click('#mode-expert')  # the page opens in Quick start
     print('info:', pg.inner_text('#inst-info'))
     pg.fill('#nseeds', '2'); pg.fill('#tlim', '3'); pg.fill('#nwork', '2'); pg.dispatch_event('#tlim', 'input')
     print('est:', pg.inner_text('#est'))

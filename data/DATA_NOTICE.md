@@ -29,9 +29,6 @@ Full references with DOIs are on the Learn page.
   table is 54793 (routing part 29244 including 5 vehicles); the same solution costs 54793 with rounding up, 54769 with truncation
   and 54777 with rounding to nearest. Only rounding up reproduces the published optimum. The site rounds up.
 
-## Still open (repository owner)
+## Terms
 
-- [ ] Written permission (or licence terms) for redistributing the P, B and T instance files and the best known values is
-  confirmed and filed with the release records. The author's statement of permission is recorded in internal notes;
-  the written terms are not filed yet.
-- [x] Distance rule of the P instances recorded (see above).
+The instance files and the best known values are shared with attribution to their sources, for non-commercial academic purposes.

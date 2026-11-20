@@ -213,7 +213,23 @@
   // ---------- start
   $('foot').textContent = 'CLRP Solver — engine ' + (catalog.engine || '') + (catalog.kit_version ? ' · data release ' + catalog.kit_version : '');
   $('heur-sel').value = 'ils'; heurCard(); renderParams(); lsCard(); $('ls-sel').value = 'rvnd'; state.ops = PRESET.common5.operators.slice(); lsCard(); renderOps();
-  { const q = new URLSearchParams(location.search).get('h'); if (q && H[q]) { $('heur-sel').value = q; $('heur-sel').onchange(); } }  // link from the Learn page
+  // ---------- quick start / expert. Quick start hides steps 2 and 3 and runs one fixed, documented setting.
+  const QUICK = { heuristic: 'ils', ls: 'rvnd', preset: 'common5', seeds: 3, tlim: 5 };   // provisional choice (the page default); to be confirmed by the benchmark runs
+  const setMode = (m, keep) => {
+    const quick = m === 'quick'; document.body.classList.toggle('quick', quick);
+    $('mode-quick').setAttribute('aria-pressed', quick); $('mode-expert').setAttribute('aria-pressed', !quick);
+    $('run-num').textContent = quick ? '2' : '4'; $('quick-card').hidden = !quick;
+    $('mode-note').textContent = quick ? 'One recommended setting. Switch to Expert to choose the heuristic, the operators and the parameters.' : 'All 18 heuristics, 5 move-selection rules and 18 operators.';
+    if (quick) {
+      $('heur-sel').value = QUICK.heuristic; $('heur-sel').onchange(); $('ls-sel').value = QUICK.ls; state.ops = PRESET[QUICK.preset].operators.slice(); lsCard(); renderOps();
+      $('seed0').value = 1; $('nseeds').value = QUICK.seeds; $('tlim').value = QUICK.tlim; updateEst();
+      $('quick-card').innerHTML = `<strong>Recommended setting.</strong> ${H[QUICK.heuristic].label} with ${$('ls-sel').selectedOptions[0].textContent} over ${state.ops.length} operators, ${QUICK.seeds} seeds × ${QUICK.tlim} s. <a href="learn.html#h-${QUICK.heuristic}">How it works</a>`;
+    }
+    if (!keep) { try { localStorage.setItem('clrp-mode', m); } catch (e) { /* storage not available */ } }
+  };
+  $('mode-quick').onclick = () => setMode('quick'); $('mode-expert').onclick = () => setMode('expert');
+  { const q = new URLSearchParams(location.search).get('h'); let m = 'quick'; try { m = localStorage.getItem('clrp-mode') || 'quick'; } catch (e) { /* storage not available */ }
+    if (q && H[q]) { setMode('expert', true); $('heur-sel').value = q; $('heur-sel').onchange(); } else setMode(m === 'expert' ? 'expert' : 'quick', true); }  // ?h=… is the link from the Learn page
   await loadBuiltin('coord20-5-1'); $('inst-sel').value = 'coord20-5-1'; updateEst();
   window.CLRP = { state, buildSpec, catalog, manifest };
 })();

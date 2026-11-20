@@ -101,3 +101,8 @@ table.nota tr.grp td { font-family: var(--sans, inherit); font-size: .8rem; font
 .model .tag { color: var(--muted); }
 p i, li i, td i, .math i { font-family: "STIX Two Text", "Cambria Math", "Latin Modern Math", "Times New Roman", serif; }
 @media (max-width: 520px) { .model.math { font-size: .88rem; padding: 4px 10px; } .model .row { gap: 8px; } .model .sum .op { font-size: 1.5em; } }
+
+/* quick start / expert */
+.mode { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 4px; }
+.mode button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+body.quick #p-heur, body.quick #p-ls, body.quick #run-fields, body.quick #run-quickbtns { display: none; }

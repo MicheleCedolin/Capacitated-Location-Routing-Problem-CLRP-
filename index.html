@@ -19,6 +19,12 @@
 <noscript><p class="err">This page needs JavaScript and WebAssembly.</p></noscript>
 <div id="boot" class="card">Loading the solver…</div>
 
+<div class="mode" role="group" aria-label="Mode">
+  <button type="button" id="mode-quick" class="small" aria-pressed="true">Quick start</button>
+  <button type="button" id="mode-expert" class="small" aria-pressed="false">Expert</button>
+  <span class="muted small" id="mode-note"></span>
+</div>
+
 <section class="panel" id="p-instance">
   <h2><span class="num">1</span>Choose an instance</h2>
   <label class="inline"><input type="radio" name="isrc" value="builtin" checked> Built-in benchmark</label>
@@ -59,14 +65,15 @@
 </section>
 
 <section class="panel" id="p-run">
-  <h2><span class="num">4</span>Run and estimated time</h2>
-  <div class="row">
+  <h2><span class="num" id="run-num">4</span>Run and estimated time</h2>
+  <div class="card" id="quick-card" hidden></div>
+  <div class="row" id="run-fields">
     <div><label for="seed0">First seed</label><input type="number" id="seed0" value="1" min="0" step="1"></div>
     <div><label for="nseeds">Number of seeds</label><input type="number" id="nseeds" value="3" min="1" max="200" step="1"></div>
     <div><label for="tlim">Time limit per run (seconds)</label><input type="number" id="tlim" value="5" min="0.5" max="3600" step="0.5"></div>
     <div><label for="nwork">Parallel workers</label><input type="number" id="nwork" value="1" min="1" max="32" step="1"></div>
   </div>
-  <div class="row" style="margin-top:10px">
+  <div class="row" id="run-quickbtns" style="margin-top:10px">
     <div><button class="small" id="q-quick" type="button">Quick test: 3 × 5 s</button> <button class="small" id="q-short" type="button">Short: 5 × 30 s</button></div>
   </div>
   <p>Estimated time: <strong id="est">–</strong> <span class="muted small" id="est-note"></span></p>
