@@ -60,3 +60,8 @@ operating systems have not been tested.
 - **Regenerating the data files.** `data/instances.json`, `data/instances/*.dat` and `data/catalog.json` come from the lab
   application kit (version in `catalog.json`, field `kit_version`); `tools/make_literature.py` regenerates the two
   literature files. After a change run the three tests above.
+
+## How to cite (prepared, switched off)
+
+Both pages contain a hidden "How to cite" box. It is filled from `data/cite.json` and appears only when `"show"` is `true`.
+Before switching it on: archive a release (for example on Zenodo), then write the DOI and the version into `data/cite.json`.

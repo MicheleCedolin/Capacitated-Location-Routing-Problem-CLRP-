@@ -1,0 +1,13 @@
+{
+ "show": false,
+ "_note": "Set show to true to display the How to cite box on both pages. Fill doi (e.g. a Zenodo DOI) and version first; empty fields are left out.",
+ "authors": [
+  "Cedolin, Michele"
+ ],
+ "title": "CLRP Solver: capacitated location-routing heuristics in the browser",
+ "year": 2026,
+ "version": "",
+ "doi": "",
+ "url": "https://michelecedolin.com/Capacitated-Location-Routing-Problem-CLRP-/",
+ "paper": ""
+}
